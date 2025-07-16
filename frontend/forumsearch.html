@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AllergMe - Forum Search</title>
+  <link rel="stylesheet" href="forumsearch.css" />
+  <style>
+    .popular-posts li a {
+      color: green;
+      text-decoration: none;
+    }
+
+    .popular-posts li a:hover {
+      text-decoration: underline;
+    }
+
+    /* New search results list */
+    .search-results {
+      list-style: none;
+      padding-left: 20px;
+      margin-top: 0;
+      font-size: 1.8rem;
+    }
+
+    .search-results li {
+      padding: 8px 0;
+    }
+
+    .search-results li a {
+      text-decoration: none;
+      color: green;
+    }
+
+    .search-results li a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="left-sidebar">
+    <div class="sidebar-title">Account</div>
+  </div>
+
+  <!-- Main content -->
+  <div class="container">
+    <h1>AllergMe</h1>
+
+    <!-- Search Input -->
+    <div class="main-content">
+      <div class="left-column">
+        <div class="search-wrapper">
+          <input type="text" id="search-input" placeholder="Search posts by title..." />
+        </div>
+
+        <!-- 🔍 Search Results (shows only while typing) -->
+        <ul class="search-results" id="search-results-list"></ul>
+      </div>
+    </div>
+
+    <!-- ⭐ Popular Posts Section (hides when typing) -->
+    <div class="divider-section" id="popular-posts-section">
+      <h2 class="posts-heading">Popular Posts</h2>
+      <hr class="horizontal-line" />
+      <ul class="popular-posts" id="popular-posts-list"></ul>
+    </div>
+  </div>
+
+  <script>
+  const availableTags = [
+    "MCAS",
+    "Allergies",
+    "Food",
+    "Pollen",
+    "Asthma",
+    "Histamine",
+    "Zyrtec",
+    "Diagnosis",
+    "Antihistamines",
+    "Supplements"
+  ];
+</script>
+
+  <!-- JavaScript to fetch and display posts -->
+  <script>
+    let allPosts = [];
+
+    async function fetchPosts() {
+      try {
+        const res = await fetch('http://localhost:8081/api/posts/');
+        if (!res.ok) throw new Error("Failed to fetch posts");
+        allPosts = await res.json();
+        renderPopularPosts(allPosts); // show popular posts initially
+      } catch (err) {
+        document.getElementById("popular-posts-list").innerHTML =
+          `<li style="color:red">${err.message}</li>`;
+      }
+    }
+
+    function renderPopularPosts(posts) {
+      const list = document.getElementById("popular-posts-list");
+      list.innerHTML = "";
+
+      const sorted = [...posts].sort((a, b) => {
+        const titleA = a.Title || "";
+        const titleB = b.Title || "";
+        const votesA = a.Votes ?? 0;
+        const votesB = b.Votes ?? 0;
+
+        if (votesB !== votesA) return votesB - votesA;
+        return titleA.localeCompare(titleB);
+      });
+
+      sorted.forEach(post => {
+        const li = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = `forum.html?id=${post.ID}`;
+        link.textContent = post.Title;
+        li.appendChild(link);
+        list.appendChild(li);
+      });
+    }
+
+    function renderSearchResults(posts, query) {
+      const resultsContainer = document.getElementById("search-results-list");
+      const popularSection = document.getElementById("popular-posts-section");
+
+      resultsContainer.innerHTML = "";
+
+      if (!query.trim()) {
+        popularSection.style.display = "block";
+        return;
+      }
+
+      popularSection.style.display = "none";
+
+      const filtered = posts
+        .filter(p => p.Title && p.Title.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, 5); // max 5 results
+
+      filtered.forEach(post => {
+        const li = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = `forum.html?id=${post.ID}`;
+        link.textContent = post.Title;
+        li.appendChild(link);
+        resultsContainer.appendChild(li);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchPosts();
+
+      const input = document.getElementById("search-input");
+      input.addEventListener("input", () => {
+        renderSearchResults(allPosts, input.value);
+      });
+    });
+  </script>
+
+</body>
+</html>
+
+
+

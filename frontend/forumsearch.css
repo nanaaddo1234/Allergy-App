@@ -1,0 +1,188 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f0f0f0;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Ensure full height layout */
+body, html {
+  height: 100%;
+}
+
+/* Left sidebar */
+.left-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100vh;
+  background-color: #e6f5e6;
+  border-right: 4px solid green;
+  z-index: 0;
+}
+
+.sidebar-title {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 20px;
+  font-weight: 600;
+  color: black;
+}
+
+/* Push main content away from sidebar */
+.container {
+  margin-left: 300px;
+  padding: 20px;
+}
+
+/* Main content layout */
+.main-content {
+  display: flex;
+  gap: 30px;
+}
+
+/* Left column layout (cleaned up) */
+.left-column {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+
+/* Right column if used */
+.right-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Header */
+h1 {
+  color: green;
+  margin: 20px 0 70px;
+  font-weight: 600;
+  font-size: 6.3rem;
+  text-align: center;
+}
+
+/* Search input section */
+.search-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0;
+  width: 100%;
+}
+
+#search-input {
+  width: 85%;
+  max-width: 900px;
+  padding: 15px;
+  font-size: 18px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+}
+
+/* Tag pills */
+.tag-pill-row {
+  display: flex;
+  gap: 45px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.tag-pill {
+  background-color: #d0eaff;
+  color: #003d66;
+  padding: 6px 28px;
+  border-radius: 999px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.tag-pill:hover {
+  background-color: #b6defd;
+}
+
+/* Divider section for "Popular Posts" */
+.divider-section {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.posts-heading {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: black;
+  margin-bottom: 10px;
+}
+
+.horizontal-line {
+  border: none;
+  height: 4px;
+  background-color: black;
+  width: 80%;
+  margin: 0 auto 30px auto;
+}
+
+/* Popular posts list */
+.popular-posts {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+
+.popular-posts li {
+  font-size: 3.25rem;
+  padding: 8px 0 8px 20px; /* Add left padding */
+  margin-left: 118px;
+  color: black;
+  cursor: pointer;
+}
+
+.popular-posts li:hover {
+  text-decoration: underline;
+  color: green;
+}
+
+.popular-posts li a {
+  text-decoration: none;
+  color: green; /* optional: ensures color matches */
+}
+
+/* Search results list under the input */
+.search-results {
+  list-style: none;
+  padding-left: 20px;
+  margin-top: 0;
+  font-size: 2.2rem;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+}
+
+.search-results li {
+  text-align: left;
+}
+
+.search-results li a {
+  text-decoration: none;
+  color: green;
+}
+
+.search-results li a:hover {
+  text-decoration: underline;
+}

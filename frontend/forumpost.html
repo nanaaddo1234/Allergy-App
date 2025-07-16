@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AllergMe - Create Post</title>
+  <link rel="stylesheet" href="forumpost.css" />
+  <style>
+    .tag-row-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 30px 30px 30px;
+    }
+
+    .tag-pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .tag-pill {
+      background-color: #d0eaff;
+      color: #003d66;
+      padding: 6px 20px;
+      border-radius: 999px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s ease;
+    }
+
+    .tag-pill:hover {
+      background-color: #b6defd;
+    }
+
+    .tag-pill.selected {
+      background-color: #006633;
+      color: white;
+    }
+
+    .tag-search-input {
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      width: 200px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="left-sidebar">
+    <div class="sidebar-title">Account</div>
+  </div>
+
+  <div class="container">
+    <h1>AllergMe</h1>
+
+    <!-- ✅ Tag Pills and Tag Search Row -->
+    <div class="tag-row-wrapper">
+      <div class="tag-pill-row" id="tag-pill-row"></div>
+      <input
+        class="tag-search-input"
+        id="tag-search"
+        type="text"
+        placeholder="Search tag..."
+      />
+    </div>
+
+    <!-- Post Form inside original green box -->
+    <div class="main-content">
+      <div class="left-column">
+        <div class="post-box">
+          <form id="post-form">
+            <input
+              id="post-title"
+              class="small-input"
+              type="text"
+              placeholder="Enter a title here..."
+              required
+            />
+            <textarea
+              id="post-content"
+              placeholder="Write your post here..."
+              required
+            ></textarea>
+            <button class="button" type="submit">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Tag Filtering & Selection Script -->
+  <script>
+    const allTags = ['MCAS', 'pollen', 'gluten', 'histamine', 'rash', 'eczema', 'allergy', 'dust', 'diet', 'fatigue'];
+    const selectedTags = new Set();
+
+    const tagInput = document.getElementById('tag-search');
+    const pillRow = document.getElementById('tag-pill-row');
+
+    // Add hidden input to form for tags
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = 'tags';
+    hiddenInput.id = 'selected-tags';
+    document.getElementById('post-form').appendChild(hiddenInput);
+
+    function updateHiddenInput() {
+      hiddenInput.value = Array.from(selectedTags).join(',');
+    }
+
+    function renderPills(query = '') {
+      pillRow.innerHTML = '';
+      const filtered = allTags.filter(tag => tag.toLowerCase().includes(query.toLowerCase())).slice(0, 6);
+
+      filtered.forEach(tag => {
+        const pill = document.createElement('span');
+        pill.className = 'tag-pill' + (selectedTags.has(tag) ? ' selected' : '');
+        pill.textContent = tag;
+
+        pill.addEventListener('click', () => {
+          if (selectedTags.has(tag)) {
+            selectedTags.delete(tag);
+          } else {
+            selectedTags.add(tag);
+          }
+          updateHiddenInput();
+          renderPills(query); // re-render pills to show .selected
+        });
+
+        pillRow.appendChild(pill);
+      });
+    }
+
+    tagInput.addEventListener('input', () => {
+      renderPills(tagInput.value);
+    });
+
+    // Initial load
+    renderPills();
+  </script>
+
+  <!-- ✅ Post Submission Logic -->
+  <script>
+    document.getElementById('post-form').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const title = document.getElementById('post-title').value;
+      const content = document.getElementById('post-content').value;
+      const tags = document.getElementById('selected-tags').value;
+      const token = localStorage.getItem("accessToken"); // ✅ Get JWT from localStorage
+
+      try {
+        const response = await fetch('http://localhost:8081/api/posts/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // ✅ Send token securely
+          },
+          body: JSON.stringify({ title, content, tags }) // ✅ no user_id here
+      });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert('Post submitted successfully!');
+          window.location.href = 'forumsearch.html';
+        } else {
+          alert('Error submitting post: ' + data.error);
+        }
+      } catch (err) {
+        alert('Network error: ' + err.message);
+      }
+    });
+  </script>
+
+</body>
+</html>
+
+
