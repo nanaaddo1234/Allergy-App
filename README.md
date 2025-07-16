@@ -1,61 +1,60 @@
-Allergy App
-Allergy App is a microservices-based web application for tracking allergies, sharing experiences, and participating in a community forum. It was built not just to showcase backend skills, but to think through how infrastructure — in code — shapes access, interaction, and trust.
+# Allergy App
 
-At its core, the app is about structure. Who gets to log in? Who gets to post? How is identity verified? These questions are answered not by the UI, but by the backend — through token checks, session management, and the layout of the data models themselves. This project is a technical response to those questions.
+**Allergy App** is a microservices-based web application for allergy tracking, personal health journaling, and forum-based discussion. This project demonstrates backend system design with secure authentication, PostgreSQL data persistence, and microservice separation. It emphasizes backend architecture and API structure over frontend framework usage.
 
-Architecture
-pgsql
-Copy
-Edit
+## Project Structure
+
+```
 allergy-app/
-  frontend/         # HTML, CSS, JavaScript (UI)
-  user-service/     # Go (authentication, JWT/session, user management, Redis)
-  forum-service/    # Go (forum posts, tags, search, Postgres)
-Frontend: Handles user login, registration, post creation, tag filtering, and forum browsing. It’s minimalist — built without frameworks — so interaction depends directly on the API’s structure.
+├── frontend/              # Static UI (HTML, CSS, JS)
+├── user-service/          # Go microservice for auth (JWT + Redis)
+└── forum-service/         # Go microservice for posts/comments (PostgreSQL)
+```
 
-User Service: Controls registration, login, and authentication. Uses Redis to track sessions and rotate refresh tokens. Passwords are hashed. JWTs are signed.
+### Microservices
 
-Forum Service: Lets users create posts, comment, and filter by tags. All actions are tied to verified user identities, checked via the token passed in each request.
+- **Frontend**: Login, registration, post creation, and tag filtering. Uses raw JavaScript with fetch-based API interaction.
+- **User Service**: Handles user registration, login, logout, JWT issuance, and Redis-based session tracking.
+- **Forum Service**: Handles post creation, comment submission, tag filtering, and JWT-authenticated user validation.
 
-Getting Started
-Prerequisites
-Go (for backend services)
+## Getting Started
 
-Docker and Docker Compose (recommended for setup)
+### Prerequisites
 
-Redis (for user-service)
+- Go 1.20+
+- PostgreSQL (forum-service)
+- Redis (user-service)
+- Docker (optional)
 
-PostgreSQL (for forum-service)
+### Run Locally
 
-Manual Start
-Start Redis and Postgres locally.
+```bash
+# Start Redis and PostgreSQL manually
 
-Set environment variables for each service (see .env.example).
+cd user-service
+go run main.go
 
-Run each Go service:
+cd ../forum-service
+go run main.go
 
-sh
-Copy
-Edit
-cd user-service && go run main.go
-cd forum-service && go run main.go
-Open frontend/login.html in your browser.
+# Then open frontend/login.html in your browser
+```
 
-Authentication Flow
-On login or registration, the backend returns a JWT and sets a session cookie.
+## Authentication Flow
 
-The frontend stores the JWT in localStorage and attaches it to protected API requests.
+- After login or registration, the user-service returns a JWT and a refresh token.
+- The JWT is stored in `localStorage` and sent via `Authorization` headers.
+- Redis manages session state and allows logout and token revocation.
+- The forum-service extracts `user_id` from the verified JWT for secure post creation.
 
-Redis tracks sessions and allows token revocation on logout.
+## API Usage
 
-The backend never trusts data from the frontend — it validates every action.
+Refer to [API.md](API.md) for full endpoint documentation.
 
-Example API Usage
-Login
+Example:
 
-http
-Copy
-Edit
+**Login**
+```http
 POST /auth/login
 Content-Type: application/json
 
@@ -63,11 +62,10 @@ Content-Type: application/json
   "email": "user@example.com",
   "password": "password123"
 }
-Create Post
+```
 
-http
-Copy
-Edit
+**Create Post**
+```http
 POST /api/posts
 Authorization: Bearer <JWT>
 Content-Type: application/json
@@ -77,38 +75,27 @@ Content-Type: application/json
   "content": "Details...",
   "tags": "pollen,gluten"
 }
-API Documentation
-See API.md for endpoint details.
+```
 
-Swagger/OpenAPI docs available at /docs if implemented.
+## Security Overview
 
-Security
-Passwords are hashed using bcrypt.
+- Passwords hashed with bcrypt.
+- JWTs signed with HMAC secret.
+- Redis stores refresh tokens for session control.
+- No client-supplied user IDs are trusted.
 
-JWTs are signed with a secret key and verified per request.
+## Features
 
-Refresh tokens are tracked in Redis and rotated automatically.
+- User registration and login
+- Stateless authentication with Redis-backed session
+- PostgreSQL storage for forum posts/comments
+- Secure API interaction
+- Separation of concerns via microservices
+- HTML/CSS/JS frontend without frameworks
 
-No user ID is accepted from the frontend — it’s derived server-side from the token.
+## License
 
-Features
-User registration and login
-
-JWT + session-based authentication
-
-Forum post creation with tag filtering
-
-Responsive static frontend
-
-Docker-ready deployment
-
-RESTful API design
-
-Clean separation between services
-
-License
 MIT
-
 
 
 For questions or suggestions, johnaddokufuor@gmail.com
